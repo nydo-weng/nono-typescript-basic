@@ -155,3 +155,211 @@ console.log("result 变量是: " + result + " 它的类型是: " + typeof result
 //   // An expression of type 'void' cannot be tested for truthiness.
 // }
 // 但是可以用 undefined 来应对这个情况
+// ==========================
+// #####  type5: object #####
+// ==========================
+let a5; // a5 的值可以是任何 [非原始类型], 包括: 对象, 函数, 数组等
+// 以下代码, 是将非原始类型 赋值给a5, 所以都符合要求
+a5 = {};
+a5 = { name: "jack" };
+a5 = [1, 2, 3, 4, 5];
+a5 = function () { };
+a5 = new String("123");
+class Person {
+}
+a5 = new Person();
+// 以下代码, 都是把 原始类型 赋值给 a5, 都飘红
+// a5 = 1;
+// a5 = true;
+// a5 = "hi";
+// a5 = null; // 严格模式下 会报错, -> "strictNullChecks": true
+// a5 = undefined; // 严格模式下 会报错, -> "strictNullChecks": true
+let b5; // b5 能存储的类型是 可以调用到 Object 方法的类型
+// 除了 null 和 undefined, 都可以存, 但是范围太大了, 实际开发不用
+// 能顺着原型链找到 Object
+b5 = {};
+b5 = { name: "jack" };
+b5 = [1, 2, 3, 4, 5];
+b5 = function () { };
+b5 = new String("123");
+class Person2 {
+}
+b5 = new Person2();
+// 这些不会报错, 大 Object 比 object 更加宽泛
+// 会自动装箱, 顺着原型链找到 Object
+b5 = 1;
+b5 = true;
+b5 = "hi";
+// 顺着原型链 也找不到 Object, 所以报错
+// b5 = null; // 严格模式下 会报错, -> "strictNullChecks": true
+// b5 = undefined; // 严格模式下 会报错, -> "strictNullChecks": true
+// *** 声明对象类型
+// [key: string]: any, 索引签名
+let person;
+person = { name: "jack", age: 19 };
+person = { name: "tom" };
+// [key: string]: any 因为有 索引签名, 所以可以追加 gender, 可以无限追加,
+// 允许定义对象可以具有 任意数量的属性
+let p3 = { name: "vincent", age: 20, gender: "男" };
+// *** 声明函数类型
+let count;
+// count 这个变量, 以后只能赋值为一个函数, 接受两个 number 返回一个 number
+// count = function (a:number, b:number): number {
+//   return a + b
+// }
+//  ^^^ 可以不用这么麻烦
+count = function (x, y) {
+    return x + y;
+};
+// *** 声明数组类型
+let arr;
+arr = ["a", "b"];
+let arr2; // 泛型
+arr2 = [1, 2, 34];
+// ==========================
+// #####  type6: tuple  #####
+// ==========================
+// 第一个元素必须是 string 类型, 第二个元素必须是 number 类型
+let arr61;
+arr61 = ["hello", 2];
+// arr61 = ["hello", 2, false]
+// 第一个元素必须是 number 类型, 第二个元素是可选的, 如果存在, 必须是 boolean 类型
+let arr62;
+arr62 = [1, false];
+arr62 = [1];
+// arr62 = [1, 2];
+// 第一个元素必须是 number 类型, 后面的元素可以是任意数量的 string 类型
+let arr63;
+arr63 = [100, "hello"];
+arr63 = [100, "hello", "world"];
+arr63 = [100];
+// ==========================
+// #####  type7: enum   #####
+// ==========================
+// 根据 调用 walk 时传入的不同参数, 执行不同的逻辑
+// 存在的问题是 调用 walk 时, 传参时没有任何提示功能, 编码的时候容易写错字符串内容
+// 而且用于判断逻辑的 up down left right 是连续且相关的一组值, 所以这种时候就很适合用 枚举 enum
+function walk(str) {
+    if (str === "up") {
+        console.log("向[上]走");
+    }
+    else if (str === "down") {
+        console.log("向[下]走");
+    }
+    else if (str === "left") {
+        console.log("向[左]走");
+    }
+    else if (str === "right") {
+        console.log("向[右]走");
+    }
+    else {
+        console.log("未知方向");
+    }
+}
+walk("up");
+walk("down");
+walk("left");
+walk("right");
+walk("test"); // 这个也不报错, 因为只要求 string
+// 这非常不好
+// 1. 数字枚举, 枚举首字母 通常用大写
+var Direction;
+(function (Direction) {
+    Direction[Direction["Up"] = 0] = "Up";
+    Direction[Direction["Down"] = 1] = "Down";
+    Direction[Direction["Left"] = 2] = "Left";
+    Direction[Direction["Right"] = 3] = "Right";
+})(Direction || (Direction = {}));
+console.log(Direction);
+// {0: 'Up', 1: 'Down', 2: 'Left', 3: 'Right', Up: 0, Down: 1, Left: 2, Right: 3}
+// 反向映射
+console.log(Direction.Up);
+console.log(Direction[0]);
+function walk2(str) {
+    if (str === Direction.Up) {
+        console.log("向[上]走");
+    }
+    else if (str === Direction.Down) {
+        console.log("向[下]走");
+    }
+    else if (str === Direction.Left) {
+        console.log("向[左]走");
+    }
+    else if (str === Direction.Right) {
+        console.log("向[右]走");
+    }
+    else {
+        console.log("未知方向");
+    }
+    // console.log(str);
+}
+// walk2("up"); // Argument of type '"up"' is not assignable to parameter of type 'Direction'.
+// walk2("Up"); // Argument of type '"Up"' is not assignable to parameter of type 'Direction'.
+walk2(Direction.Up);
+// Direction.Up = 99;  常量不能修改
+// 2. 字符串枚举
+// 区别就是把原来的递增, 改成字符串值, 但是会丢失反向映射
+var DirectionStr;
+(function (DirectionStr) {
+    DirectionStr["Up"] = "up";
+    DirectionStr["Down"] = "down";
+    DirectionStr["Left"] = "left";
+    DirectionStr["Right"] = "right";
+})(DirectionStr || (DirectionStr = {}));
+console.log(DirectionStr);
+console.log("down" /* DirectionConst.Down */);
+let a8;
+a8 = 100;
+function printStatus(data) {
+    console.log(data);
+}
+printStatus(404);
+printStatus("404");
+function printGender(input) {
+    console.log(input);
+}
+// printGender("a");  // 报错 Argument of type '"a"' is not assignable to parameter of type 'Gender'.
+printGender("男");
+const house = {
+    height: 100,
+    width: 100,
+    num: 3,
+    cell: 4,
+    room: "700",
+};
+// 特殊情况
+// 代码 1, 正常代码
+function demo8() {
+    // 返回 undefined 合法
+    return undefined;
+    // 以下返回均不合法
+    // return 100;
+    // return false;
+    // return null;
+    // return [];
+}
+demo8();
+// let LogFunc: () => void; 和上面一样
+// LogFunc = function() {} 这个报错, 因为 LogFunc 用的 type, 不是 let, 不是变量, 是一个类型
+const f81 = function () {
+    // return undefined;  // 合法
+    return 999; // 这里虽然不是 void, 但它不报错, 不管是啥都可以 void 在这不起作用
+}; // 这里是把 type 先定义, 然后赋给函数, 不起作用
+const f2 = () => 666;
+const f3 = function () { };
+// function LogFunc2(): void {
+//   return 999;
+// }  这里会飘红, 这里是在函数定义时就写了限制, 起作用了
+let x8 = f2();
+console.log(x8); // 666
+// if(x8) {
+//   // 这里飘红, 因为 x8 是 f2 函数的执行结果, f2 的类型是 LogFunc
+//   // LogFunc 的返回值应该是 void, 不应该依赖 void 做任何操作
+//   // An expression of type 'void' cannot be tested for truthiness.ts(1345)
+// }
+// 以上的目的是 为了以下代码城里
+const src = [1, 2, 3];
+const dst = [0];
+src.forEach((el) => dst.push(el));
+// 写成箭头函数, 返回值没有{} 只有一行时, 默认返回那一行的值, push 返回一个数字, 但是 forEach 方法期望 回调的返回类型是 void,
+// 为了让这个可以运行, 所以有了这个宽松的特殊情况

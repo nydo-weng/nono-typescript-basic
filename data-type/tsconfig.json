@@ -10,6 +10,7 @@
     "module": "commonjs",
     "target": "ES6", // ts -> js 的目标,
     "noEmitOnError": true,
+    "strictNullChecks": true,
     // "types": [],
     // For nodejs:
     // "lib": ["esnext"],
